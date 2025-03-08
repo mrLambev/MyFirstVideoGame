@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Target
   - Wall
+  - Beer Bottle
   layers:
   - Default
   - TransparentFX
