@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
+    // Константы:
+    private const string RECOIL_TAG = "RECOIL";
 
     // Стрельба:
     public bool isShooting, readyToShoot;
@@ -25,6 +27,12 @@ public class Weapon : MonoBehaviour
     public float bulletVelocity = 100F;
     public float bulletPrefabLifeTime = 3F;
 
+    // Дульный эффект:
+    public GameObject muzzleEffect;
+
+    // Анимации:
+    public Animator animator;
+
     public enum ShootingMode
     {
         Single,
@@ -41,6 +49,7 @@ public class Weapon : MonoBehaviour
     {
         readyToShoot = true;
         burstBulletsLeft = bulletsPerBurst;
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -67,6 +76,16 @@ public class Weapon : MonoBehaviour
 
     private void FireWeapon()
     {
+        // Запускаем дульный эффект:
+        muzzleEffect.GetComponent<ParticleSystem>().Play();
+
+        // Триггерим анимацию выстрела:
+        animator.SetTrigger(RECOIL_TAG);
+
+        // TODO: захардкоженный звук:
+        // Запускаем звук выстрела:
+        SoundManager.Instance.shootingSound_AK47.Play();
+
         // Сразу меняем на ЛОЖЬ, потому что мы не хотим стрелять сразу снова:
         readyToShoot = false;
 
