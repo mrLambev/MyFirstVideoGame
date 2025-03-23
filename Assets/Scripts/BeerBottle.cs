@@ -7,9 +7,16 @@ public class BeerBottle : MonoBehaviour
 
     public void Shatter()
     {
+        // Проигрываем звук:
+        SoundManager.Instance.BeerBottle_Break.Play();
+
+        // Делаем все частички бутылки двигающимися:
         foreach (Rigidbody part in allParts)
         {
             part.isKinematic = false;
         }
+
+        // Убирваем коллайдер объекта:
+        GetComponent<BoxCollider>().enabled = false;
     }
 }

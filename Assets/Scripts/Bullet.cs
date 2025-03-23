@@ -13,6 +13,9 @@ public class Bullet : MonoBehaviour
 
             CreateBulletImpactEffect(objectWeHit);
 
+            // Проигрываем звук попадания по цели:
+            SoundManager.Instance.Bullet_Hit.Play();
+
             Destroy(gameObject);
         }
 

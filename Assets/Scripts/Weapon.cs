@@ -1,13 +1,12 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
     // Константы:
-    private const string RECOIL_TAG = "RECOIL";
+    private const string RECOIL_ANIM_TAG = "RECOIL";
+    private const string RELOAD_ANIM_TAG = "RELOAD";
 
     // Стрельба:
     public bool isShooting, readyToShoot;
@@ -33,6 +32,11 @@ public class Weapon : MonoBehaviour
     // Анимации:
     public Animator animator;
 
+    // Перезарядка:
+    public float reloadTime;
+    public int magazineSize, bulletsLeft;
+    public bool isReloading;
+
     public enum ShootingMode
     {
         Single,
@@ -50,6 +54,8 @@ public class Weapon : MonoBehaviour
         readyToShoot = true;
         burstBulletsLeft = bulletsPerBurst;
         animator = GetComponent<Animator>();
+
+        bulletsLeft = magazineSize;
     }
 
     private void Update()
@@ -57,6 +63,13 @@ public class Weapon : MonoBehaviour
         // Полезная инфа:
         // Input.GetKey() срабатывает, когда кнопка зажата
         // Input.GetKeyDown() срабатывает, когда кнопка нажата
+
+        // Если пользователь пытается выстрелить, но в обойме нет патрон, то проигрываем звук:
+        if(bulletsLeft <= 0 && isShooting)
+        {
+            // TODO: захардкоженный звук:
+            SoundManager.Instance.AK47_EmptyMagazine.Play();
+        }
 
         // При автоматическом режиме стрельба будет вестись только тогда, когда игрок зажимает кнопку:
         if (currentShootingMode == ShootingMode.Auto)
@@ -67,24 +80,47 @@ public class Weapon : MonoBehaviour
             isShooting = Input.GetKeyDown(SHOOT_KEY_CODE);
         }
 
-        if (readyToShoot && isShooting)
+        /// Триггер перезарядки:
+        // Перезарядка по нажатию клавиши:
+        if (Input.GetKeyDown(KeyCode.R) && (bulletsLeft < magazineSize) && (isReloading == false))
+        {
+            Reload();
+        }
+
+        // Перезарядка по окончании патронов в обойме:
+        //if (readyToShoot && (isShooting == false) && (isReloading == false) && (bulletsLeft <= 0))
+        //{
+        //    Reload();
+        //}
+
+        // Стрельба:
+        if ((readyToShoot && isShooting) && (bulletsLeft > 0))
         {
             burstBulletsLeft = bulletsPerBurst;
             FireWeapon();
+        }
+
+        // Обновляем показываемое количетсво патронов в обойме:
+        if(AmmoManager.Instance.ammoCountDisplay != null)
+        {
+            AmmoManager.Instance.ammoCountDisplay.text = $"{bulletsLeft}/{magazineSize}";
         }
     }
 
     private void FireWeapon()
     {
+        // Уменьшаем количество пуль в обойме:
+        bulletsLeft--;
+
         // Запускаем дульный эффект:
         muzzleEffect.GetComponent<ParticleSystem>().Play();
 
         // Триггерим анимацию выстрела:
-        animator.SetTrigger(RECOIL_TAG);
+        animator.SetTrigger(RECOIL_ANIM_TAG);
 
         // TODO: захардкоженный звук:
         // Запускаем звук выстрела:
-        SoundManager.Instance.shootingSound_AK47.Play();
+        SoundManager.Instance.AK47_Shot.Play();
 
         // Сразу меняем на ЛОЖЬ, потому что мы не хотим стрелять сразу снова:
         readyToShoot = false;
@@ -117,6 +153,27 @@ public class Weapon : MonoBehaviour
             burstBulletsLeft--;
             Invoke("FireWeapon", shootingDelay);
         }
+    }
+
+    // Метод для перезарядки:
+    private void Reload()
+    {
+        isReloading = true;
+
+        // Триггерим анимацию перезарядки:
+        animator.SetTrigger(RELOAD_ANIM_TAG);
+
+        // TODO: захардкоженный звук:
+        // Запускаем звук перезарядки:
+        SoundManager.Instance.AK47_Reload.Play();
+        Invoke("ReloadCompleted", reloadTime);
+    }
+
+    // Метод для восстановления количества патронов в обойме:
+    private void ReloadCompleted()
+    {
+        bulletsLeft = magazineSize;
+        isReloading = false;
     }
 
     private Vector3 CalculateDirectionAndSpread()
