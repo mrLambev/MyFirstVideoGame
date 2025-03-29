@@ -1,10 +1,10 @@
 using TMPro;
 using UnityEngine;
 
-public class AmmoManager : MonoBehaviour
-{
-    public static AmmoManager Instance { set; get; }
+public class HUDManager : MonoBehaviour {
+    public static HUDManager Instance { set; get; }
 
+    public TextMeshProUGUI shootingModeDisplay;
     public TextMeshProUGUI ammoCountDisplay;
 
     private void Awake()

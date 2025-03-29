@@ -11,6 +11,7 @@ public class SoundManager : MonoBehaviour
     public AudioSource AK47_Shot;
     public AudioSource AK47_Reload;
     public AudioSource AK47_EmptyMagazine;
+    public AudioSource AK47_ChangeShootingMode;
 
     private void Awake()
     {

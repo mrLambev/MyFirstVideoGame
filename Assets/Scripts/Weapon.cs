@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -71,6 +72,52 @@ public class Weapon : MonoBehaviour
             SoundManager.Instance.AK47_EmptyMagazine.Play();
         }
 
+        // !Hardcoded смена режимов:
+        // TODO: может быть неактуально для всех видов оружий:
+        // Смена режима стрельбы:
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            switch (currentShootingMode) 
+            {
+                case ShootingMode.Single:
+                    SoundManager.Instance.AK47_ChangeShootingMode.Play();
+                    currentShootingMode = ShootingMode.Burst;
+                    break;
+                case ShootingMode.Burst:
+                    SoundManager.Instance.AK47_ChangeShootingMode.Play();
+                    currentShootingMode = ShootingMode.Auto;
+                    break;
+                case ShootingMode.Auto:
+                    SoundManager.Instance.AK47_ChangeShootingMode.Play();
+                    currentShootingMode = ShootingMode.Single;
+                    break;
+                default:
+                    print("Для данного режима стрельбы не предусмотрена смена!");
+                    break;
+            }
+        }
+
+        // Показываем режим стрельбы в HUD:
+        if (HUDManager.Instance.shootingModeDisplay != null)
+        {
+            switch (currentShootingMode)
+            {
+                case ShootingMode.Single:
+                    HUDManager.Instance.shootingModeDisplay.text = "Single";
+                    break;
+                case ShootingMode.Burst:
+                    HUDManager.Instance.shootingModeDisplay.text = "Burst";
+                    break;
+                case ShootingMode.Auto:
+                    HUDManager.Instance.shootingModeDisplay.text = "Auto";
+                    break;
+                default:
+                    HUDManager.Instance.shootingModeDisplay.text = "Unknown";
+                    print("Для данного режима стрельбы не предусмотрен текст!");
+                    break;
+            }
+        }
+
         // При автоматическом режиме стрельба будет вестись только тогда, когда игрок зажимает кнопку:
         if (currentShootingMode == ShootingMode.Auto)
         {
@@ -101,9 +148,9 @@ public class Weapon : MonoBehaviour
         }
 
         // Обновляем показываемое количетсво патронов в обойме:
-        if(AmmoManager.Instance.ammoCountDisplay != null)
+        if(HUDManager.Instance.ammoCountDisplay != null)
         {
-            AmmoManager.Instance.ammoCountDisplay.text = $"{bulletsLeft}/{magazineSize}";
+            HUDManager.Instance.ammoCountDisplay.text = $"{bulletsLeft}/{magazineSize}";
         }
     }
 

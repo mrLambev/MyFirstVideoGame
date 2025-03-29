@@ -10,13 +10,13 @@ public class BeerBottle : MonoBehaviour
         // Проигрываем звук:
         SoundManager.Instance.BeerBottle_Break.Play();
 
+        // Убираем коллайдер объекта:
+        GetComponent<BoxCollider>().enabled = false;
+
         // Делаем все частички бутылки двигающимися:
         foreach (Rigidbody part in allParts)
         {
             part.isKinematic = false;
         }
-
-        // Убирваем коллайдер объекта:
-        GetComponent<BoxCollider>().enabled = false;
     }
 }
