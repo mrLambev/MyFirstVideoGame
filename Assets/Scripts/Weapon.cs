@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
+    // Индикатор активности оружия:
+    public bool isActive = false;
+
     // Константы:
     private const string RECOIL_ANIM_TAG = "RECOIL";
     private const string RELOAD_ANIM_TAG = "RELOAD";
@@ -31,12 +34,19 @@ public class Weapon : MonoBehaviour
     public GameObject muzzleEffect;
 
     // Анимации:
-    public Animator animator;
+    internal Animator animator;
 
     // Перезарядка:
     public float reloadTime;
     public int magazineSize, bulletsLeft;
     public bool isReloading;
+
+    public enum WeaponModel
+    {
+        Colt1911,
+        AK74
+    }
+    public WeaponModel thisWeaponModel;
 
     public enum ShootingMode
     {
@@ -45,10 +55,15 @@ public class Weapon : MonoBehaviour
         Auto
     }
 
-    public ShootingMode currentShootingMode;
+    private ShootingMode[] shootingModes;
+    private int currentShootingModeIndex = 0;
 
     // Бинды:
     public const KeyCode SHOOT_KEY_CODE = KeyCode.Mouse0;
+
+    // Расположение от первого лица:
+    public Vector3 positionInFPP;
+    public Vector3 rotationInFPP;
 
     private void Awake()
     {
@@ -57,100 +72,113 @@ public class Weapon : MonoBehaviour
         animator = GetComponent<Animator>();
 
         bulletsLeft = magazineSize;
+
+        // Назначаем режимы стрельбы для данного оружия:
+        switch (thisWeaponModel)
+        {
+            case WeaponModel.Colt1911:
+                shootingModes = new ShootingMode[] {ShootingMode.Single };
+                break;
+            case WeaponModel.AK74:
+                shootingModes = new ShootingMode[] {ShootingMode.Single, ShootingMode.Burst, ShootingMode.Auto };
+                break;
+            default:
+                print("Для данного оружия не предусмотрены режимы стрельбы! Исправьте код!");
+                break;
+        }
     }
 
     private void Update()
     {
-        // Полезная инфа:
-        // Input.GetKey() срабатывает, когда кнопка зажата
-        // Input.GetKeyDown() срабатывает, когда кнопка нажата
+        if (isActive) {
+            // Полезная инфа:
+            // Input.GetKey() срабатывает, когда кнопка зажата
+            // Input.GetKeyDown() срабатывает, когда кнопка нажата
 
-        // Если пользователь пытается выстрелить, но в обойме нет патрон, то проигрываем звук:
-        if(bulletsLeft <= 0 && isShooting)
-        {
-            // TODO: захардкоженный звук:
-            SoundManager.Instance.AK47_EmptyMagazine.Play();
-        }
+            // Активное оружие ни в коем случае не может быть выделено:
+            GetComponent<Outline>().enabled = false;
 
-        // !Hardcoded смена режимов:
-        // TODO: может быть неактуально для всех видов оружий:
-        // Смена режима стрельбы:
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            switch (currentShootingMode) 
+            // Если пользователь пытается выстрелить, но в обойме нет патрон, то проигрываем звук:
+            if (bulletsLeft <= 0 && isShooting)
             {
-                case ShootingMode.Single:
-                    SoundManager.Instance.AK47_ChangeShootingMode.Play();
-                    currentShootingMode = ShootingMode.Burst;
-                    break;
-                case ShootingMode.Burst:
-                    SoundManager.Instance.AK47_ChangeShootingMode.Play();
-                    currentShootingMode = ShootingMode.Auto;
-                    break;
-                case ShootingMode.Auto:
-                    SoundManager.Instance.AK47_ChangeShootingMode.Play();
-                    currentShootingMode = ShootingMode.Single;
-                    break;
-                default:
-                    print("Для данного режима стрельбы не предусмотрена смена!");
-                    break;
+                SoundManager.Instance.PlayEmptyMagazineSound(thisWeaponModel);
             }
-        }
 
-        // Показываем режим стрельбы в HUD:
-        if (HUDManager.Instance.shootingModeDisplay != null)
-        {
-            switch (currentShootingMode)
+            // !Hardcoded смена режимов:
+            // TODO: может быть неактуально для всех видов оружий:
+            // Смена режима стрельбы:
+            if (Input.GetKeyDown(KeyCode.B))
             {
-                case ShootingMode.Single:
-                    HUDManager.Instance.shootingModeDisplay.text = "Single";
-                    break;
-                case ShootingMode.Burst:
-                    HUDManager.Instance.shootingModeDisplay.text = "Burst";
-                    break;
-                case ShootingMode.Auto:
-                    HUDManager.Instance.shootingModeDisplay.text = "Auto";
-                    break;
-                default:
-                    HUDManager.Instance.shootingModeDisplay.text = "Unknown";
-                    print("Для данного режима стрельбы не предусмотрен текст!");
-                    break;
+                if (shootingModes.Length > 1)
+                {
+                    if (currentShootingModeIndex == (shootingModes.Length - 1))
+                    {
+                        currentShootingModeIndex = 0;
+                    }
+                    else
+                    {
+                        currentShootingModeIndex++;
+                    }
+
+                    SoundManager.Instance.PlayChangeShootingMode(thisWeaponModel);
+                }
             }
-        }
 
-        // При автоматическом режиме стрельба будет вестись только тогда, когда игрок зажимает кнопку:
-        if (currentShootingMode == ShootingMode.Auto)
-        {
-            isShooting = Input.GetKey(SHOOT_KEY_CODE);
-        } else if (currentShootingMode == ShootingMode.Single || currentShootingMode == ShootingMode.Burst)
-        {
-            isShooting = Input.GetKeyDown(SHOOT_KEY_CODE);
-        }
+            // Показываем режим стрельбы в HUD:
+            if (HUDManager.Instance.shootingModeDisplay != null)
+            {
+                switch (shootingModes[currentShootingModeIndex])
+                {
+                    case ShootingMode.Single:
+                        HUDManager.Instance.shootingModeDisplay.text = "Single";
+                        break;
+                    case ShootingMode.Burst:
+                        HUDManager.Instance.shootingModeDisplay.text = "Burst";
+                        break;
+                    case ShootingMode.Auto:
+                        HUDManager.Instance.shootingModeDisplay.text = "Auto";
+                        break;
+                    default:
+                        HUDManager.Instance.shootingModeDisplay.text = "Unknown";
+                        print("Для данного режима стрельбы не предусмотрен текст!");
+                        break;
+                }
+            }
 
-        /// Триггер перезарядки:
-        // Перезарядка по нажатию клавиши:
-        if (Input.GetKeyDown(KeyCode.R) && (bulletsLeft < magazineSize) && (isReloading == false))
-        {
-            Reload();
-        }
+            // При автоматическом режиме стрельба будет вестись только тогда, когда игрок зажимает кнопку:
+            if (shootingModes[currentShootingModeIndex] == ShootingMode.Auto)
+            {
+                isShooting = Input.GetKey(SHOOT_KEY_CODE);
+            } else if (shootingModes[currentShootingModeIndex] == ShootingMode.Single || shootingModes[currentShootingModeIndex] == ShootingMode.Burst)
+            {
+                isShooting = Input.GetKeyDown(SHOOT_KEY_CODE);
+            }
 
-        // Перезарядка по окончании патронов в обойме:
-        //if (readyToShoot && (isShooting == false) && (isReloading == false) && (bulletsLeft <= 0))
-        //{
-        //    Reload();
-        //}
+            /// Триггер перезарядки:
+            // Перезарядка по нажатию клавиши:
+            if (Input.GetKeyDown(KeyCode.R) && (bulletsLeft < magazineSize) && (isReloading == false))
+            {
+                Reload();
+            }
 
-        // Стрельба:
-        if ((readyToShoot && isShooting) && (bulletsLeft > 0))
-        {
-            burstBulletsLeft = bulletsPerBurst;
-            FireWeapon();
-        }
+            // Перезарядка по окончании патронов в обойме:
+            //if (readyToShoot && (isShooting == false) && (isReloading == false) && (bulletsLeft <= 0))
+            //{
+            //    Reload();
+            //}
 
-        // Обновляем показываемое количетсво патронов в обойме:
-        if(HUDManager.Instance.ammoCountDisplay != null)
-        {
-            HUDManager.Instance.ammoCountDisplay.text = $"{bulletsLeft}/{magazineSize}";
+            // Стрельба:
+            if ((readyToShoot && isShooting) && (bulletsLeft > 0))
+            {
+                burstBulletsLeft = bulletsPerBurst;
+                FireWeapon();
+            }
+
+            // Обновляем показываемое количетсво патронов в обойме:
+            if (HUDManager.Instance.ammoCountDisplay != null)
+            {
+                HUDManager.Instance.ammoCountDisplay.text = $"{bulletsLeft}/{magazineSize}";
+            }
         }
     }
 
@@ -165,9 +193,8 @@ public class Weapon : MonoBehaviour
         // Триггерим анимацию выстрела:
         animator.SetTrigger(RECOIL_ANIM_TAG);
 
-        // TODO: захардкоженный звук:
         // Запускаем звук выстрела:
-        SoundManager.Instance.AK47_Shot.Play();
+        SoundManager.Instance.PlayShootingSound(thisWeaponModel);
 
         // Сразу меняем на ЛОЖЬ, потому что мы не хотим стрелять сразу снова:
         readyToShoot = false;
@@ -195,7 +222,7 @@ public class Weapon : MonoBehaviour
         }
 
         // Если стрельба очередью:
-        if(currentShootingMode == ShootingMode.Burst && burstBulletsLeft > 1)
+        if(shootingModes[currentShootingModeIndex] == ShootingMode.Burst && burstBulletsLeft > 1)
         {
             burstBulletsLeft--;
             Invoke("FireWeapon", shootingDelay);
@@ -210,9 +237,8 @@ public class Weapon : MonoBehaviour
         // Триггерим анимацию перезарядки:
         animator.SetTrigger(RELOAD_ANIM_TAG);
 
-        // TODO: захардкоженный звук:
         // Запускаем звук перезарядки:
-        SoundManager.Instance.AK47_Reload.Play();
+        SoundManager.Instance.PlayReloadSound(thisWeaponModel);
         Invoke("ReloadCompleted", reloadTime);
     }
 

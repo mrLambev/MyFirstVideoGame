@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Weapon;
 
 public class SoundManager : MonoBehaviour
 {
@@ -8,10 +9,16 @@ public class SoundManager : MonoBehaviour
 
     public AudioSource Bullet_Hit;
 
-    public AudioSource AK47_Shot;
-    public AudioSource AK47_Reload;
-    public AudioSource AK47_EmptyMagazine;
-    public AudioSource AK47_ChangeShootingMode;
+    public AudioSource ShootingChannel;
+
+    public AudioClip Colt1911_Shot;
+    public AudioSource Colt1911_Reload;
+    public AudioSource Colt1911_EmptyMagazine;
+
+    public AudioClip AK74_Shot;
+    public AudioSource AK74_Reload;
+    public AudioSource AK74_EmptyMagazine;
+    public AudioSource AK74_ChangeShootingMode;
 
     private void Awake()
     {
@@ -22,6 +29,57 @@ public class SoundManager : MonoBehaviour
         else
         {
             Instance = this;
+        }
+    }
+
+    public void PlayShootingSound(WeaponModel weaponModel)
+    {
+        switch(weaponModel) {
+            case WeaponModel.Colt1911:
+                ShootingChannel.PlayOneShot(Colt1911_Shot);
+                break;
+            case WeaponModel.AK74:
+                ShootingChannel.PlayOneShot(AK74_Shot);
+                break;
+        }
+    }
+
+    public void PlayReloadSound(WeaponModel weaponModel)
+    {
+        switch (weaponModel)
+        {
+            case WeaponModel.Colt1911:
+                Colt1911_Reload.Play();
+                break;
+            case WeaponModel.AK74:
+                AK74_Reload.Play();
+                break;
+        }
+    }
+
+    public void PlayEmptyMagazineSound(WeaponModel weaponModel)
+    {
+        switch (weaponModel)
+        {
+            case WeaponModel.Colt1911:
+                Colt1911_EmptyMagazine.Play();
+                break;
+            case WeaponModel.AK74:
+                AK74_EmptyMagazine.Play();
+                break;
+        }
+    }
+
+    public void PlayChangeShootingMode(WeaponModel weaponModel)
+    {
+        switch (weaponModel)
+        {
+            case WeaponModel.Colt1911:
+                print("Для данного оружия не предусмотрен звук смены режима стрельбы!");
+                break;
+            case WeaponModel.AK74:
+                AK74_ChangeShootingMode.Play();
+                break;
         }
     }
 }
