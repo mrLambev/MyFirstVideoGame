@@ -2,6 +2,7 @@ using NUnit.Framework.Constraints;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Weapon : MonoBehaviour
 {
@@ -11,20 +12,29 @@ public class Weapon : MonoBehaviour
     // Константы:
     private const string RECOIL_ANIM_TAG = "RECOIL";
     private const string RELOAD_ANIM_TAG = "RELOAD";
+    private const string ENTER_ADS_ANIM_TAG = "enterADS";
+    private const string EXIT_ADS_ANIM_TAG = "exitADS";
+    private const string RECOIL_ADS_ANIM_TAG = "RECOIL_ADS";
 
     // Стрельба:
+    [Header("Shooting")]
     public bool isShooting, readyToShoot;
     bool allowReset = true;
     public float shootingDelay = 2f;
 
     // Стрельба очередью:
+    [Header("Burst")]
     public int bulletsPerBurst = 3;
     public int burstBulletsLeft;
 
     // Разброс:
+    [Header("Spread")]
     public float spreadIntensity;
+    public float hipSpreadIntensity;
+    public float adsSpreadIntenisty;
 
     // Пуля:
+    [Header("Bullet")]
     public GameObject bulletPrefab;
     public Transform bulletSpawn;
     public float bulletVelocity = 100F;
@@ -37,6 +47,7 @@ public class Weapon : MonoBehaviour
     internal Animator animator;
 
     // Перезарядка:
+    [Header("Reloading")]
     public float reloadTime;
     public int magazineSize, bulletsLeft;
     public bool isReloading;
@@ -65,6 +76,9 @@ public class Weapon : MonoBehaviour
     public Vector3 positionInFPP;
     public Vector3 rotationInFPP;
 
+    // В прицеле или нет:
+    private bool isADS;
+
     private void Awake()
     {
         readyToShoot = true;
@@ -72,6 +86,8 @@ public class Weapon : MonoBehaviour
         animator = GetComponent<Animator>();
 
         bulletsLeft = magazineSize;
+
+        spreadIntensity = hipSpreadIntensity;
 
         // Назначаем режимы стрельбы для данного оружия:
         switch (thisWeaponModel)
@@ -97,6 +113,18 @@ public class Weapon : MonoBehaviour
 
             // Активное оружие ни в коем случае не может быть выделено:
             GetComponent<Outline>().enabled = false;
+
+            // Переходим в ADS:
+            if (Input.GetMouseButtonDown(1))
+            {
+                EnterADS();
+            }
+            
+            // Выходим из ADS:
+            if (Input.GetMouseButtonUp(1))
+            {
+                ExitADS();
+            }
 
             // Если пользователь пытается выстрелить, но в обойме нет патрон, то проигрываем звук:
             if (bulletsLeft <= 0 && isShooting)
@@ -155,6 +183,24 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    // Вход в прицел:
+    private void EnterADS()
+    {
+        isADS = true;
+        HUDManager.Instance.crosshair.SetActive(false);
+        animator.SetTrigger(ENTER_ADS_ANIM_TAG);
+        spreadIntensity = adsSpreadIntenisty;
+    }
+
+    // Выход из прицела:
+    private void ExitADS()
+    {
+        isADS = false;
+        HUDManager.Instance.crosshair.SetActive(true);
+        animator.SetTrigger(EXIT_ADS_ANIM_TAG);
+        spreadIntensity = hipSpreadIntensity;
+    }
+
     public ShootingMode shootingMode
     {
         get { return shootingModes[currentShootingModeIndex]; }
@@ -169,7 +215,14 @@ public class Weapon : MonoBehaviour
         muzzleEffect.GetComponent<ParticleSystem>().Play();
 
         // Триггерим анимацию выстрела:
-        animator.SetTrigger(RECOIL_ANIM_TAG);
+        if (isADS)
+        {
+            animator.SetTrigger(RECOIL_ADS_ANIM_TAG);
+        }
+        else
+        {
+            animator.SetTrigger(RECOIL_ANIM_TAG);
+        }
 
         // Запускаем звук выстрела:
         SoundManager.Instance.PlayShootingSound(thisWeaponModel);
