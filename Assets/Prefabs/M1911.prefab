@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 551964319157158719}
   - component: {fileID: 1946425892948248287}
   - component: {fileID: 4206895424133242129}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Slide
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 6210829080704052452}
   - component: {fileID: 4187424943219219088}
   - component: {fileID: 1458392080662298993}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Magazin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 3819301562421278801}
   - component: {fileID: 4770865308175466990}
   - component: {fileID: 5705551022340685224}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MagazinThrowaway
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -269,7 +269,7 @@ GameObject:
   - component: {fileID: 2536869514831744984}
   - component: {fileID: 1502596096375524707}
   - component: {fileID: 4629928564587570720}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Hammer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -357,7 +357,7 @@ GameObject:
   - component: {fileID: 3005835542124806569}
   - component: {fileID: 4713505511030080086}
   - component: {fileID: 6960656235813157060}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: M1911
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -450,6 +450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00ad9b9612f1204f96222d7b7c0cc31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isActive: 0
   isShooting: 1
   readyToShoot: 0
   shootingDelay: 0.2
@@ -461,7 +462,6 @@ MonoBehaviour:
   bulletVelocity: 75
   bulletPrefabLifeTime: 3
   muzzleEffect: {fileID: 9166683204883057594}
-  animator: {fileID: 0}
   reloadTime: 1.65
   magazineSize: 10
   bulletsLeft: 0
@@ -500,7 +500,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 195026999981732138}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BulletSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -534,7 +534,7 @@ GameObject:
   - component: {fileID: 4790951862230034718}
   - component: {fileID: 4990876172820471893}
   - component: {fileID: 1423077648568024484}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -620,7 +620,7 @@ GameObject:
   - component: {fileID: 7352529930212695758}
   - component: {fileID: 7634247545857001710}
   - component: {fileID: 5181509995869993726}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MuzzleFlashEffect_1911
   m_TagString: Untagged
   m_Icon: {fileID: 0}

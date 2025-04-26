@@ -10,6 +10,8 @@ public class InteractionManager : MonoBehaviour
 
     public Weapon weaponWeHoverOver = null;
 
+    public AmmoBox ammoBoxWeHoverOver = null;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -31,6 +33,7 @@ public class InteractionManager : MonoBehaviour
         {
             GameObject gameObjectWeHit = hit.transform.gameObject;
 
+            // Если мы смотрим на оружие (Weapon):
             if (gameObjectWeHit.GetComponent<Weapon>())
             {
                 weaponWeHoverOver = gameObjectWeHit.gameObject.GetComponent<Weapon>();
@@ -46,6 +49,27 @@ public class InteractionManager : MonoBehaviour
                 if (weaponWeHoverOver)
                 {
                     weaponWeHoverOver.GetComponent<Outline>().enabled = false;
+                }
+            }
+
+            // Если мы смотрим на ящик с пулями (AmmoBox):
+            if (gameObjectWeHit.GetComponent<AmmoBox>())
+            {
+                ammoBoxWeHoverOver = gameObjectWeHit.gameObject.GetComponent<AmmoBox>();
+                ammoBoxWeHoverOver.GetComponent<Outline>().enabled = true;
+
+                if (Input.GetKeyDown(PICK_UP_KEYCODE))
+                {
+                    WeaponManager.Instance.PickupAmmo(ammoBoxWeHoverOver);
+                    // Уничтожаем ящик с оружием из сцены:
+                    Destroy(gameObjectWeHit.gameObject);
+                }
+            }
+            else
+            {
+                if (ammoBoxWeHoverOver)
+                {
+                    ammoBoxWeHoverOver.GetComponent<Outline>().enabled = false;
                 }
             }
         }

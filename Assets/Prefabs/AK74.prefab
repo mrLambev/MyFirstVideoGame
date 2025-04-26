@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2751103580796713628}
   - component: {fileID: 3942922073212354091}
   - component: {fileID: 7470254878342536904}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 6013070546395374590}
   - component: {fileID: 565692000614925377}
   - component: {fileID: 6549576151038935359}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MuzzleFlashEffect_AK74
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4883,7 +4883,7 @@ GameObject:
   - component: {fileID: 6333019521050342500}
   - component: {fileID: 7008468077893202313}
   - component: {fileID: 6228200703111311351}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4971,7 +4971,7 @@ GameObject:
   - component: {fileID: 2102132655101496891}
   - component: {fileID: 7805382154234616838}
   - component: {fileID: 1167706848537862170}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AK74
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5063,6 +5063,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00ad9b9612f1204f96222d7b7c0cc31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isActive: 0
   isShooting: 0
   readyToShoot: 0
   shootingDelay: 0.15
@@ -5074,7 +5075,6 @@ MonoBehaviour:
   bulletVelocity: 500
   bulletPrefabLifeTime: 3
   muzzleEffect: {fileID: 3238520546144861471}
-  animator: {fileID: 0}
   reloadTime: 2
   magazineSize: 30
   bulletsLeft: 0
@@ -5115,7 +5115,7 @@ GameObject:
   - component: {fileID: 2267933107327959520}
   - component: {fileID: 7962183783831399301}
   - component: {fileID: 1333322971817105180}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5199,7 +5199,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 318971469076947591}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BulletSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5233,7 +5233,7 @@ GameObject:
   - component: {fileID: 2740513898421676031}
   - component: {fileID: 3262529771152119332}
   - component: {fileID: 7697262668804679463}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MagThrowaway
   m_TagString: Untagged
   m_Icon: {fileID: 0}

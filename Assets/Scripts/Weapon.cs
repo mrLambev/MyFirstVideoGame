@@ -77,10 +77,10 @@ public class Weapon : MonoBehaviour
         switch (thisWeaponModel)
         {
             case WeaponModel.Colt1911:
-                shootingModes = new ShootingMode[] {ShootingMode.Single };
+                shootingModes = new ShootingMode[] { ShootingMode.Single };
                 break;
             case WeaponModel.AK74:
-                shootingModes = new ShootingMode[] {ShootingMode.Single, ShootingMode.Burst, ShootingMode.Auto };
+                shootingModes = new ShootingMode[] { ShootingMode.Single, ShootingMode.Burst, ShootingMode.Auto };
                 break;
             default:
                 print("Для данного оружия не предусмотрены режимы стрельбы! Исправьте код!");
@@ -124,27 +124,6 @@ public class Weapon : MonoBehaviour
                 }
             }
 
-            // Показываем режим стрельбы в HUD:
-            if (HUDManager.Instance.shootingModeDisplay != null)
-            {
-                switch (shootingModes[currentShootingModeIndex])
-                {
-                    case ShootingMode.Single:
-                        HUDManager.Instance.shootingModeDisplay.text = "Single";
-                        break;
-                    case ShootingMode.Burst:
-                        HUDManager.Instance.shootingModeDisplay.text = "Burst";
-                        break;
-                    case ShootingMode.Auto:
-                        HUDManager.Instance.shootingModeDisplay.text = "Auto";
-                        break;
-                    default:
-                        HUDManager.Instance.shootingModeDisplay.text = "Unknown";
-                        print("Для данного режима стрельбы не предусмотрен текст!");
-                        break;
-                }
-            }
-
             // При автоматическом режиме стрельба будет вестись только тогда, когда игрок зажимает кнопку:
             if (shootingModes[currentShootingModeIndex] == ShootingMode.Auto)
             {
@@ -156,7 +135,7 @@ public class Weapon : MonoBehaviour
 
             /// Триггер перезарядки:
             // Перезарядка по нажатию клавиши:
-            if (Input.GetKeyDown(KeyCode.R) && (bulletsLeft < magazineSize) && (isReloading == false))
+            if (Input.GetKeyDown(KeyCode.R) && (bulletsLeft < magazineSize) && (isReloading == false) && (WeaponManager.Instance.CheckAmmoLeftFor(thisWeaponModel) > 0))
             {
                 Reload();
             }
@@ -173,13 +152,12 @@ public class Weapon : MonoBehaviour
                 burstBulletsLeft = bulletsPerBurst;
                 FireWeapon();
             }
-
-            // Обновляем показываемое количетсво патронов в обойме:
-            if (HUDManager.Instance.ammoCountDisplay != null)
-            {
-                HUDManager.Instance.ammoCountDisplay.text = $"{bulletsLeft}/{magazineSize}";
-            }
         }
+    }
+
+    public ShootingMode shootingMode
+    {
+        get { return shootingModes[currentShootingModeIndex]; }
     }
 
     private void FireWeapon()
@@ -245,7 +223,19 @@ public class Weapon : MonoBehaviour
     // Метод для восстановления количества патронов в обойме:
     private void ReloadCompleted()
     {
-        bulletsLeft = magazineSize;
+        // Получаем количество патронов, оставшихся для данного оружия:
+        int ammoAmountLeft = WeaponManager.Instance.CheckAmmoLeftFor(thisWeaponModel);
+        if(ammoAmountLeft > magazineSize) 
+        {
+            bulletsLeft = magazineSize;
+        }
+        else
+        {
+            bulletsLeft = ammoAmountLeft;
+        }
+
+        WeaponManager.Instance.DecreaseTotalAmmoAmount(bulletsLeft, thisWeaponModel);
+
         isReloading = false;
     }
 

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e7152d23c09aee845a9594ff1308f6a8
+timeCreated: 1498165126
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 90071
+  packageName: Ammo Crate Wood Ammunition Box
+  packageVersion: 1.0
+  assetPath: Assets/ammo_box/Prefabs/Ammo_box.prefab
+  uploadId: 186374
