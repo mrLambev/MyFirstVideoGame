@@ -8,6 +8,7 @@ public class HUDManager : MonoBehaviour {
     public const string AK74_WEAPON_SPRITE_RESOURCE_NAME = "AK74_Weapon";
     public const string PISTOL_AMMO_SPRITE_RESOURCE_NAME = "Pistol_Ammo";
     public const string RIFLE_AMMO_SPRITE_RESOURCE_NAME = "Rifle_Ammo";
+    public const string HIGH_EXPLOSIVE_GRENADE_SPRITE_RESOURCE_NAME = "HighExplosiveGrenade";
 
     public static HUDManager Instance { set; get; }
 
@@ -101,9 +102,9 @@ public class HUDManager : MonoBehaviour {
         switch (model)
         {
             case Weapon.WeaponModel.Colt1911:
-                return Instantiate(Resources.Load<GameObject>(COLT1911_WEAPON_SPRITE_RESOURCE_NAME)).GetComponent<SpriteRenderer>().sprite;
+                return Resources.Load<GameObject>(COLT1911_WEAPON_SPRITE_RESOURCE_NAME).GetComponent<SpriteRenderer>().sprite;
             case Weapon.WeaponModel.AK74:
-                return Instantiate(Resources.Load<GameObject>(AK74_WEAPON_SPRITE_RESOURCE_NAME)).GetComponent<SpriteRenderer>().sprite;
+                return Resources.Load<GameObject>(AK74_WEAPON_SPRITE_RESOURCE_NAME).GetComponent<SpriteRenderer>().sprite;
             default:
                 return null;
         }
@@ -114,9 +115,9 @@ public class HUDManager : MonoBehaviour {
         switch (model)
         {
             case Weapon.WeaponModel.Colt1911:
-                return Instantiate(Resources.Load<GameObject>(PISTOL_AMMO_SPRITE_RESOURCE_NAME)).GetComponent<SpriteRenderer>().sprite;
+                return Resources.Load<GameObject>(PISTOL_AMMO_SPRITE_RESOURCE_NAME).GetComponent<SpriteRenderer>().sprite;
             case Weapon.WeaponModel.AK74:
-                return Instantiate(Resources.Load<GameObject>(RIFLE_AMMO_SPRITE_RESOURCE_NAME)).GetComponent<SpriteRenderer>().sprite;
+                return Resources.Load<GameObject>(RIFLE_AMMO_SPRITE_RESOURCE_NAME).GetComponent<SpriteRenderer>().sprite;
             default:
                 return null;
         }
@@ -134,5 +135,16 @@ public class HUDManager : MonoBehaviour {
 
         // Это не должно произойти, но это нужно прописать, а то компилятор выдаст ошибку:
         return null;
+    }
+
+    internal void UpdateThrowables(Throwable.ThrowableType throwableType)
+    {
+        switch (throwableType)
+        {
+            case Throwable.ThrowableType.HighExplosiveGrenade:
+                lethalAmountUI.text = $"{WeaponManager.Instance.highExplosiveGrenades}";
+                lethalUI.sprite = Resources.Load<GameObject>(HIGH_EXPLOSIVE_GRENADE_SPRITE_RESOURCE_NAME).GetComponent<SpriteRenderer>().sprite;
+                break;
+        }
     }
 }

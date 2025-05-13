@@ -8,6 +8,7 @@ using static Weapon;
 
 public class WeaponManager : MonoBehaviour
 {
+    public const KeyCode ThrowableThrowKeyCode = KeyCode.G;
     public static WeaponManager Instance { set; get; }
 
     // Список всех слотов для оружия:
@@ -19,6 +20,15 @@ public class WeaponManager : MonoBehaviour
     [Header("Ammo")]
     public int totalPistolAmmoAmount = 0;
     public int totalRifleAmmoAmount = 0;
+
+    // Гранаты (Throwable):
+    [Header("Throwables")]
+    public int highExplosiveGrenades = 0;
+    public float throwForce = 10f; // - сила броска Throwable
+    public GameObject highExplosiveGrenadePrefab;
+    public GameObject throwableSpawn;
+    public float forceMultiplier = 0f; // - множитель силы броска; нужен для того, чтобы увеличивать силу броска по мере подготовки к броску
+    public float forceMultiplierLimit = 2f;
 
     private void Start()
     {
@@ -58,6 +68,30 @@ public class WeaponManager : MonoBehaviour
         else if(Input.GetKeyDown(KeyCode.Alpha2))
         {
             SwitchActiveSlot(1);
+        }
+
+        // Подготовка к броску гранаты (Throwable):
+        if (Input.GetKey(ThrowableThrowKeyCode))
+        {
+            forceMultiplier += Time.deltaTime;
+
+            // Проверяем на предоление верхнего лимита:
+            if (forceMultiplier > forceMultiplierLimit)
+            {
+                forceMultiplier = forceMultiplierLimit;
+            }
+        }
+
+        // Бросок гранаты (Throwable):
+        //! Полезная инфа: метод Input.GetKeyUp() проверяет, поднята ли определенная клавиша
+        if (Input.GetKeyUp(ThrowableThrowKeyCode))
+        {
+            if(highExplosiveGrenades > 0)
+            {
+                ThrowThrowable();
+            }
+
+            forceMultiplier = 0;
         }
     }
 
@@ -159,4 +193,45 @@ public class WeaponManager : MonoBehaviour
                 break;
         }
     }
+
+
+    #region || ---- Throwables ---- ||
+    // Подбирает гранату (Throwable):
+    public void PickupThrowable(Throwable throwable)
+    {
+        switch (throwable.throwableType)
+        {
+            case Throwable.ThrowableType.HighExplosiveGrenade:
+                PickupHighExplosiveGrenade();
+                break;
+        }
+    }
+
+    private void PickupHighExplosiveGrenade()
+    {
+        highExplosiveGrenades += 1;
+
+        HUDManager.Instance.UpdateThrowables(Throwable.ThrowableType.HighExplosiveGrenade);
+    }
+
+    // Бросает гранату (Throwable):
+    private void ThrowThrowable()
+    {
+        GameObject throwablePrefab = highExplosiveGrenadePrefab;
+        
+        // Создаем Throwable в сцене:
+        GameObject throwable = Instantiate(throwablePrefab, throwableSpawn.transform.position, Camera.main.transform.rotation);
+        Rigidbody rb = throwable.GetComponent<Rigidbody>();
+
+        // Применяем силу к созданному объекту:
+        rb.AddForce(Camera.main.transform.forward * (throwForce * forceMultiplier), ForceMode.Impulse);
+
+        throwable.GetComponent<Throwable>().hasBeenThrown = true;
+
+        highExplosiveGrenades -= 1;
+
+        // Обновляем UI:
+        HUDManager.Instance.UpdateThrowables(Throwable.ThrowableType.HighExplosiveGrenade);
+    }
+    #endregion
 }

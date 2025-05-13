@@ -12,6 +12,8 @@ public class InteractionManager : MonoBehaviour
 
     public AmmoBox ammoBoxWeHoverOver = null;
 
+    public Throwable throwableWeHoverOver = null;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -70,6 +72,27 @@ public class InteractionManager : MonoBehaviour
                 if (ammoBoxWeHoverOver)
                 {
                     ammoBoxWeHoverOver.GetComponent<Outline>().enabled = false;
+                }
+            }
+
+            // Если мы смотрим на гранату (Throwable):
+            if (gameObjectWeHit.GetComponent<Throwable>())
+            {
+                throwableWeHoverOver = gameObjectWeHit.gameObject.GetComponent<Throwable>();
+                throwableWeHoverOver.GetComponent<Outline>().enabled = true;
+
+                if (Input.GetKeyDown(PICK_UP_KEYCODE))
+                {
+                    WeaponManager.Instance.PickupThrowable(throwableWeHoverOver);
+                    // Уничтожаем ящик с оружием из сцены:
+                    Destroy(gameObjectWeHit.gameObject);
+                }
+            }
+            else
+            {
+                if (throwableWeHoverOver)
+                {
+                    throwableWeHoverOver.GetComponent<Outline>().enabled = false;
                 }
             }
         }
