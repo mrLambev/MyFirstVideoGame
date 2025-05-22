@@ -8,6 +8,8 @@ public class GlobalReferences : MonoBehaviour
 
     public GameObject highExplosionGrenadeEffect;
 
+    public GameObject smokeGrenadeEffect;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

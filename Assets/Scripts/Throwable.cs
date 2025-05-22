@@ -14,7 +14,9 @@ public class Throwable : MonoBehaviour
 
     public enum ThrowableType 
     { 
-        HighExplosiveGrenade
+        None,
+        HighExplosiveGrenade,
+        SmokeGrenade
     }
 
     public ThrowableType throwableType;
@@ -56,6 +58,9 @@ public class Throwable : MonoBehaviour
             case ThrowableType.HighExplosiveGrenade:
                 HighExplosiveEffect();
                 break;
+            case ThrowableType.SmokeGrenade:
+                SmokeGrenadeEffect();
+                break;
             default:
                 print("UNKNOWN THROWABLE TYPE!");
                 break;
@@ -72,7 +77,8 @@ public class Throwable : MonoBehaviour
         // Создаем эффект взрыва осколочной гранаты в сцене:
         Instantiate(explosionEffect, transform.position, transform.rotation);
 
-
+        // Проигрываем звук взрыва:
+        SoundManager.Instance.throwablesChannel.PlayOneShot(SoundManager.Instance.highExplosiveGrenadeSound);
 
         // ФИЗИЧЕСКИЙ ЭФФЕКТ:
         // Полезная инфа: Physics.OverlapSphere() определяет все Collider, которые задеты сферой
@@ -90,6 +96,38 @@ public class Throwable : MonoBehaviour
             {
                 // Полезная инфа: метод AddExplosionForce() объекта Rigidbody применяет к нему силу взрыва
                 rb.AddExplosionForce(explosionForce, transform.position, damageRadius);
+            }
+        }
+    }
+
+    // Метод для запуска эффекта дымовой гранаты:
+    private void SmokeGrenadeEffect()
+    {
+        // ВИЗУАЛЬНЫЙ ЭФФЕКТ:
+        // Получаем ВИЗУАЛЬНЫЙ эффект дымовой гранаты:
+        GameObject smokeEffect = GlobalReferences.Instance.smokeGrenadeEffect;
+
+        // Создаем эффект взрыва выхода дыма в сцене:
+        Instantiate(smokeEffect, transform.position, transform.rotation);
+
+        // Проигрываем звук выхода дыма:
+        SoundManager.Instance.throwablesChannel.PlayOneShot(SoundManager.Instance.smokeGrenadeSound);
+
+        // ФИЗИЧЕСКИЙ ЭФФЕКТ
+        // Получаем Collider всех объектом в радиусе действия:
+        Collider[] collidersInRange = Physics.OverlapSphere(transform.position, damageRadius);
+
+        // ФИЗИЧЕСКИЙ ЭФФЕКТ
+        // Проходимся по всем Collider, которые зацеплены гранатой:
+        foreach (Collider colliderInRange in collidersInRange)
+        {
+            // Пытаемся получить Rigidbody у объекта, которому принадлежит данный Collider:
+            Rigidbody rb = colliderInRange.GetComponent<Rigidbody>();
+
+            // Если удалось получить Rigidbody, то применяем к объекту дымовой эффект:
+            if (rb != null)
+            {
+                // TODO: Предусмотреть ослепление мобов
             }
         }
     }

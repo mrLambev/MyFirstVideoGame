@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using static Weapon;
 
@@ -19,6 +20,10 @@ public class SoundManager : MonoBehaviour
     public AudioSource AK74_Reload;
     public AudioSource AK74_EmptyMagazine;
     public AudioSource AK74_ChangeShootingMode;
+
+    public AudioSource throwablesChannel;
+    public AudioClip highExplosiveGrenadeSound;
+    public AudioClip smokeGrenadeSound;
 
     private void Awake()
     {

@@ -84,8 +84,6 @@ public class InteractionManager : MonoBehaviour
                 if (Input.GetKeyDown(PICK_UP_KEYCODE))
                 {
                     WeaponManager.Instance.PickupThrowable(throwableWeHoverOver);
-                    // ”ничтожаем €щик с оружием из сцены:
-                    Destroy(gameObjectWeHit.gameObject);
                 }
             }
             else

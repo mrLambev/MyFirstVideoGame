@@ -9,6 +9,7 @@ public class HUDManager : MonoBehaviour {
     public const string PISTOL_AMMO_SPRITE_RESOURCE_NAME = "Pistol_Ammo";
     public const string RIFLE_AMMO_SPRITE_RESOURCE_NAME = "Rifle_Ammo";
     public const string HIGH_EXPLOSIVE_GRENADE_SPRITE_RESOURCE_NAME = "HighExplosiveGrenade";
+    public const string SMOKE_GRENADE_SPRITE_RESOURCE_NAME = "SmokeGrenade";
 
     public static HUDManager Instance { set; get; }
 
@@ -32,6 +33,7 @@ public class HUDManager : MonoBehaviour {
     public TextMeshProUGUI tacticalAmountUI;
 
     public Sprite emptySlot;
+    public Sprite greySlot;
 
     public GameObject crosshair;
 
@@ -95,6 +97,18 @@ public class HUDManager : MonoBehaviour {
             activeWeaponUI.sprite = emptySlot;
             unActiveWeaponUI.sprite = emptySlot;
         }
+
+        // Если у нас нет боевых гранат (Throwable), то не показываем UI для них:
+        if (WeaponManager.Instance.lethalsCount <= 0)
+        {
+            lethalUI.sprite = greySlot;
+        }
+
+        // Если у нас нет тактических гранат (Throwable), то не показываем UI для них:
+        if (WeaponManager.Instance.tacticalsCount <= 0)
+        {
+            tacticalUI.sprite = greySlot;
+        }
     }
 
     private Sprite GetWeaponSprite(Weapon.WeaponModel model)
@@ -137,13 +151,22 @@ public class HUDManager : MonoBehaviour {
         return null;
     }
 
-    internal void UpdateThrowables(Throwable.ThrowableType throwableType)
+    internal void UpdateThrowablesUI()
     {
-        switch (throwableType)
+
+        lethalAmountUI.text = $"{WeaponManager.Instance.lethalsCount}";
+        switch (WeaponManager.Instance.equippedLethalThrowableType)
         {
             case Throwable.ThrowableType.HighExplosiveGrenade:
-                lethalAmountUI.text = $"{WeaponManager.Instance.highExplosiveGrenades}";
                 lethalUI.sprite = Resources.Load<GameObject>(HIGH_EXPLOSIVE_GRENADE_SPRITE_RESOURCE_NAME).GetComponent<SpriteRenderer>().sprite;
+                break;
+        }
+
+        tacticalAmountUI.text = $"{WeaponManager.Instance.tacticalsCount}";
+        switch (WeaponManager.Instance.equippedTacticalThrowableType)
+        {
+            case Throwable.ThrowableType.SmokeGrenade:
+                tacticalUI.sprite = Resources.Load<GameObject>(SMOKE_GRENADE_SPRITE_RESOURCE_NAME).GetComponent<SpriteRenderer>().sprite;
                 break;
         }
     }
